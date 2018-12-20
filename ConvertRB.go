@@ -7,6 +7,7 @@ import (
 	"golang.org/x/text/encoding/charmap"
 	"io"
 	"log"
+	"reflect"
 )
 
 func convert(w io.Writer, f io.Reader, movementFields MovementFields) {
@@ -22,27 +23,19 @@ func convert(w io.Writer, f io.Reader, movementFields MovementFields) {
 	i := 0
 	for _, rec := range records {
 		i++
+
 		if i > 1 {
 			movement := NewMovement()
-			movement.PostingDate = rec[movementFields.PostingDate]
-			movement.ValueDate = rec[movementFields.ValueDate]
-			movement.AccNoID = rec[movementFields.AccNoID]
-			movement.AccName = rec[movementFields.AccName]
-			//movement. = rec[0] //Kategorie transakce
-			movement.PartnerAccNo = rec[movementFields.PartnerAccNo]
-			movement.PartnerAccName = rec[movementFields.PartnerAccName]
-			movement.MovementTypeText = rec[movementFields.MovementTypeText]
-			movement.Description1 = rec[movementFields.Description1]
-			//movement.ValueDate = rec[8] //Poznámka
-			movement.Statistics2 = rec[movementFields.Statistics2]
-			movement.Statistics1 = rec[movementFields.Statistics1]
-			movement.Statistics3 = rec[movementFields.Statistics3]
-			movement.Amount = rec[movementFields.Amount]
-			//			movement.AccCcy = rec[movementFields.AccCcy]
-			//movement. = rec[movementFields.PostingDate]
-			//movement.ValueDate = rec[movementFields.PostingDate]
-			movement.ChargesAmount = rec[movementFields.ChargesAmount]
-			movement.ItemNo = rec[movementFields.ItemNo]
+			s := reflect.ValueOf(&movementFields).Elem()
+			typeOfT := s.Type()
+			for i := 0; i < s.NumField(); i++ {
+				f := s.Field(i)
+				x := genericGetValue(f.Interface().(MovementImpl), rec)
+				movementPointer := reflect.ValueOf(&movement)
+				s := movementPointer.Elem()
+				movementField := s.FieldByName(typeOfT.Field(i).Name)
+				movementField.SetString(x)
+			}
 
 			accountMovements.AddMovement(movement)
 		}
@@ -52,7 +45,17 @@ func convert(w io.Writer, f io.Reader, movementFields MovementFields) {
 
 	check(err)
 	xmlstring = []byte(xml.Header + string(xmlstring))
-	fmt.Print(xmlstring)
 	fmt.Fprintf(w, "%s\n", xmlstring)
 
+}
+
+func genericGetValue(movementFieldImpl MovementImpl, rec []string) string {
+	v := reflect.ValueOf(movementFieldImpl.function)
+	t := v.Type()
+	argv := make([]reflect.Value, t.NumIn())
+	argv[0] = reflect.ValueOf(rec)
+	argv[1] = reflect.ValueOf(movementFieldImpl.index)
+	result := v.Call(argv)[0]
+	x := result.String()
+	return x
 }
