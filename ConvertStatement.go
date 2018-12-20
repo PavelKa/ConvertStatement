@@ -23,5 +23,5 @@ func main() {
 	fi, err := os.Open(*inputFile)
 	check(err)
 	defer fi.Close()
-	convert(fo, fi)
+	convert(fo, fi, newMovementFieldRsB())
 }
