@@ -21,9 +21,8 @@ func convert(w io.Writer, f io.Reader) {
 	}
 	i := 0
 	for _, rec := range records {
-		if true {
-			i = i + 1
-
+		i++
+		if i > 1 {
 			movement := NewMovement()
 			movement.PostingDate = rec[0] //Datum provedení
 			movement.ValueDate = rec[1]   //    Datum zaúčtování
