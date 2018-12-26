@@ -1,9 +1,5 @@
 package main
 
-import (
-	"reflect"
-)
-
 type AccountMovements struct {
 	official               string `xml:"Amount,attr"`
 	statemDebitTotal       string `xml:"StatemDebitTotal,attr"`
@@ -21,19 +17,15 @@ func NewAccountMovements() AccountMovements {
 	return accountMovements
 }
 
-func (m Movement) SetByName(fieldName string, value string) Item {
-	movementPointer := reflect.ValueOf(&m)
-	setFieldValue(movementPointer, fieldName, value)
-	return m
-}
-
-func (c *AccountMovements) CreateItem() Item {
+func (c *AccountMovements) CreateItem() interface{} {
 	m := Movement{}
-	return m
-}
-func (c *AccountMovements) AddItem(item Item) {
+	//c.FakturaV = append(c.FakturaV, m)
 
-	c.Movement = append(c.Movement, item.(Movement))
+	return &m
+}
+func (c *AccountMovements) AddItem(item interface{}) {
+	fv := (item).(*Movement)
+	c.Movement = append(c.Movement, *fv)
 
 }
 

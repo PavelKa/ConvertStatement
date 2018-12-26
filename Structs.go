@@ -28,8 +28,8 @@ func newConversionImplF(fieldName string, csvIndex int, f ConversionFieldFunctio
 type ConversionFields []ConversionImpl
 
 type ItemList interface {
-	AddItem(Item)
-	CreateItem() Item
+	AddItem(interface{})
+	CreateItem() interface{}
 }
 
 type Item interface {

@@ -8,7 +8,7 @@ import (
 	"reflect"
 )
 
-func convert(w io.Writer, r *csv.Reader, convDefinition ConversionFields, items ItemList) {
+func convert(w io.Writer, r *csv.Reader, convDefinition ConversionFields, items interface{}) {
 
 	records, err := r.ReadAll()
 	check(err)
@@ -17,13 +17,14 @@ func convert(w io.Writer, r *csv.Reader, convDefinition ConversionFields, items 
 		i++
 		if i > 1 {
 
-			item := items.CreateItem()
+			item := items.(ItemList).CreateItem()
 
 			for _, f := range convDefinition {
 				x := genericGetValue(f, rec)
-				item = item.SetByName(f.fieldName, x)
+				ee := setField(item, f.fieldName, x)
+				check(ee)
 			}
-			items.AddItem(item)
+			items.(ItemList).AddItem(item)
 
 		}
 	}

@@ -92,8 +92,10 @@ func getDirection(rec []string, i int) string {
 	}
 }
 
-func setFieldValue(movementPointer reflect.Value, fieldName string, value string) {
-	s := movementPointer.Elem()
-	movementField := s.FieldByName(fieldName)
-	movementField.SetString(value)
+func setField(v interface{}, name string, value string) error {
+	stype := reflect.ValueOf(v).Elem()
+	field := stype.FieldByName(name)
+	field.SetString(value)
+
+	return nil
 }

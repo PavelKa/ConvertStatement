@@ -1,9 +1,5 @@
 package main
 
-import (
-	"reflect"
-)
-
 type winstrom struct {
 	FakturaV []FakturaVydana `xml:"faktura-vydana"`
 }
@@ -14,20 +10,15 @@ func newWinstrom() winstrom {
 	return winstrom
 }
 
-func (m FakturaVydana) SetByName(fieldName string, value string) Item {
-	movementPointer := reflect.ValueOf(&m)
-
-	setFieldValue(movementPointer, fieldName, value)
-	return m
-}
-
-func (c *winstrom) CreateItem() Item {
+func (c *winstrom) CreateItem() interface{} {
 	m := FakturaVydana{}
-	return m
-}
-func (c *winstrom) AddItem(item Item) {
+	//c.FakturaV = append(c.FakturaV, m)
 
-	c.FakturaV = append(c.FakturaV, item.(FakturaVydana))
+	return &m
+}
+func (c *winstrom) AddItem(item interface{}) {
+	fv := (item).(*FakturaVydana)
+	c.FakturaV = append(c.FakturaV, *fv)
 
 }
 
